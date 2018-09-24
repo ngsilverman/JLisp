@@ -13,25 +13,43 @@ class JLispCoreTest {
 
     private fun Any?.eval(closure: JLispClosure) = processor.eval(this, closure)
 
-    private fun String.jsonArray() = JSONArray(this)
-
     @BeforeEach
     fun beforeEach() {
         processor = JLispProcessor()
     }
 
     @Test
-    fun evalPlusInt2Parameters() {
+    fun array() {
+        assertEquals(listOf(1, 2, 3), ("""["array", 1, 2, 3]""".jsonArray().eval() as JSONArray).toList())
+    }
+
+    @Test
+    fun evalNull() {
+        assertEquals(null, """["eval", null]""".jsonArray().eval())
+    }
+
+    @Test
+    fun evalString() {
+        assertEquals("Hello, world!", """["eval", "Hello, world!"]""".jsonArray().eval())
+    }
+
+    @Test
+    fun let() {
+        assertEquals(7, """["let", ["variable", 7], "%variable"]""".jsonArray().eval())
+    }
+
+    @Test
+    fun map() {
+        assertEquals(listOf(2, 3, 4), ("""["map", ["fn", ["+", "%", 1]], ["array", 1, 2, 3]]""".jsonArray().eval() as JSONArray).toList())
+    }
+
+    @Test
+    fun plusInt2Parameters() {
         assertEquals(2, """["+", 1, 1]""".jsonArray().eval())
     }
 
     @Test
-    fun evalPlusInt3Parameters() {
+    fun plusInt3Parameters() {
         assertEquals(3, """["+", 1, 1, 1]""".jsonArray().eval())
-    }
-
-    @Test
-    fun evalLet() {
-        assertEquals(7, """["let", ["variable", 7], "%variable%"]""".jsonArray().eval())
     }
 }

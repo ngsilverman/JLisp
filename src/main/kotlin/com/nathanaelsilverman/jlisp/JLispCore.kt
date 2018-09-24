@@ -2,11 +2,61 @@ package com.nathanaelsilverman.jlisp
 
 import org.json.JSONArray
 
+internal object Fn : JLispFunction1<Any?, JLispFunction<Any?>> {
+
+    override fun evaluateParameters() = false
+
+    override fun call(p1: Any?): JLispFunction<Any?> {
+        return object : JLispFunction<Any?> {
+            override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
+                var functionClosure = closure
+                args.forEachIndexed { index, arg ->
+                    // Parameters are bound to indexed variables starting with 1.
+                    val binding = (index + 1).toString() to arg
+                    functionClosure += binding
+                }
+                return processor.eval(p1, functionClosure)
+            }
+        }
+    }
+}
+
+/**
+ * Had to prepend a 'J' not to conflict with [Array].
+ */
+internal object JArray : JLispFunctionVar<JSONArray> {
+    override fun call(args: List<Any?>) = JSONArray().apply {
+        args.forEach { put(it) }
+    }
+}
+
+/**
+ * Had to prepend a 'J' not to conflict with [Map].
+ */
+internal object JMap : JLispFunction<JSONArray?> {
+    override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): JSONArray? {
+        // We expect the function to take a single parameter, but we can't rely on it implementing [JLispFunction1]
+        // because [Fn] returns a generic [JLispFunction].
+        val function = args[0] as JLispFunction<Any?>
+        val array = args[1] as JSONArray?
+        return if (array == null) {
+            null
+        } else {
+            JSONArray().apply {
+                (0 until array.length()).forEach { index ->
+                    val mappedValue = function.call(processor, closure, listOf(array[index]))
+                    put(mappedValue)
+                }
+            }
+        }
+    }
+}
+
 internal object Let : JLispMacro<Any?> {
     override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
         val bindings = args[0] as JSONArray
         require(bindings.length() % 2 == 0)
-        val expressions: Any? = args[1]
+        val expression: Any? = args[1]
 
         var letClosure = closure
 
@@ -18,10 +68,10 @@ internal object Let : JLispMacro<Any?> {
                 }
                 .forEach { (key, value) ->
                     val binding = key to processor.eval(value, letClosure)
-                    letClosure = letClosure.plus(binding)
+                    letClosure += binding
                 }
 
-        return processor.eval(expressions, letClosure)
+        return processor.eval(expression, letClosure)
     }
 }
 

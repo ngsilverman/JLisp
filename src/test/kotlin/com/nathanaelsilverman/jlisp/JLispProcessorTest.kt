@@ -1,5 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
+import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,6 +24,11 @@ class JLispProcessorTest {
     }
 
     @Test
+    fun evalJsonObjectNull() {
+        assertEquals(null, JSONObject.NULL.eval())
+    }
+
+    @Test
     fun evalString() {
         assertEquals("Hello, world!", "Hello, world!".eval())
     }
@@ -34,7 +40,7 @@ class JLispProcessorTest {
 
     @Test
     fun variable() {
-        assertEquals(7, "%variable%".eval(mapOf("variable" to 7)))
+        assertEquals(7, "%variable".eval(mapOf("variable" to 7)))
     }
 
     /**
@@ -42,21 +48,16 @@ class JLispProcessorTest {
      */
     @Test
     fun stringPercent() {
-        assertEquals("%variable%", "/%variable%".eval())
+        assertEquals("%variable", "/%variable".eval())
     }
 
     @Test
     fun stringBackPercent() {
-        assertEquals("/%variable%", "//%variable%".eval())
+        assertEquals("/%variable", "//%variable".eval())
     }
 
     @Test
     fun stringSinglePercent() {
-        assertEquals("%", "%".eval())
-    }
-
-    @Test
-    fun stringDoublePercent() {
-        assertEquals("%%", "%%".eval())
+        assertEquals(7, "%".eval(mapOf("1" to 7)))
     }
 }

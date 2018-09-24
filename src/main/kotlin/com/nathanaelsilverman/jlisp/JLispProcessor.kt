@@ -1,6 +1,7 @@
 package com.nathanaelsilverman.jlisp
 
 import org.json.JSONArray
+import org.json.JSONObject
 
 class JLispProcessor {
 
@@ -10,8 +11,11 @@ class JLispProcessor {
 
     private val coreClosure: JLispClosure = mutableMapOf<String, JLispFunction<*>>().apply {
         put("+", Plus)
+        put("array", JArray)
         put("eval", eval)
+        put("fn", Fn)
         put("let", Let)
+        put("map", JMap)
         put("print", Print)
         put("println", PrintLn)
     }
@@ -22,6 +26,7 @@ class JLispProcessor {
         return when (value) {
             is JSONArray -> evalJsonArray(value, closure)
             is String -> evalString(value, closure)
+            JSONObject.NULL -> null
             else -> value
         }
     }
@@ -51,14 +56,15 @@ class JLispProcessor {
 
     private fun evalString(string: String, closure: JLispClosure): Any? {
         return when {
-            string.length > 2 && string.startsWith('%') && string.endsWith('%') -> {
-                closure[string.drop(1).dropLast(1)].also {
+            string.startsWith('%') -> {
+                val variableName = if (string == "%") "%1" else string
+                closure[variableName.drop(1)].also {
                     requireNotNull(it) {
-                        "Variable \"$string\" was not set."
+                        "Variable \"$variableName\" was not set."
                     }
                 }
             }
-            string.length > 2 && string.contains("^/+%".toRegex()) && string.endsWith('%') -> {
+            string.contains("^/+%".toRegex()) -> {
                 string.drop(1)
             }
             else -> string
