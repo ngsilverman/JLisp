@@ -2,6 +2,64 @@ package com.nathanaelsilverman.jlisp
 
 import org.json.JSONArray
 
+internal object Eval : JLispFunction<Any?> {
+
+    override fun evaluateParameters() = false
+
+    override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
+        val expression: Any? = args[0]
+        return eval(processor, closure, expression)
+    }
+
+    private fun eval(processor: JLispProcessor, closure: JLispClosure, value: Any?): Any? {
+        return when (value) {
+            is JSONArray -> evalJsonArray(processor, closure, value)
+            is String -> evalString(value, closure)
+            else -> value
+        }
+    }
+
+    private fun evalJsonArray(processor: JLispProcessor, closure: JLispClosure, jsonArray: JSONArray): Any? {
+        val functionName = jsonArray.getString(0)
+        val function = closure[functionName]
+
+        require(function is JLispFunction<*>) {
+            "$functionName is not a function."
+        }
+        function as JLispFunction<*>
+
+        val arguments = (1 until jsonArray.length())
+                .map { index ->
+                    jsonArray[index].let {
+                        if (function.evaluateParameters()) {
+                            eval(processor, closure, it)
+                        } else {
+                            it
+                        }
+                    }
+                }
+
+        return function.call(processor, closure, arguments)
+    }
+
+    private fun evalString(string: String, closure: JLispClosure): Any? {
+        return when {
+            string.startsWith('%') -> {
+                val variableName = if (string == "%") "%1" else string
+                closure[variableName.drop(1)].also {
+                    requireNotNull(it) {
+                        "Variable \"$variableName\" was not set."
+                    }
+                }
+            }
+            string.contains("^/+%".toRegex()) -> {
+                string.drop(1)
+            }
+            else -> string
+        }
+    }
+}
+
 internal object Fn : JLispFunction1<Any?, JLispFunction<Any?>> {
 
     override fun evaluateParameters() = false
