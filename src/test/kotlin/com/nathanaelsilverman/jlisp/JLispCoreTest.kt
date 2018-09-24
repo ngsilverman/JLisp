@@ -23,6 +23,11 @@ class JLispCoreTest {
     }
 
     @Test
+    fun arraySyntacticSugar() {
+        assertEquals(listOf(1, 2, 3), ("""[[1, 2, 3]]""".jsonArray().eval() as JSONArray).toList())
+    }
+
+    @Test
     fun evalNull() {
         assertEquals(JSONObject.NULL, """["eval", null]""".jsonArray().eval())
     }

@@ -20,7 +20,14 @@ internal object Eval : JLispFunction<Any?> {
     }
 
     private fun evalJsonArray(processor: JLispProcessor, closure: JLispClosure, jsonArray: JSONArray): Any? {
-        val functionName = jsonArray.getString(0)
+        val first = jsonArray[0]
+
+        // Enables the syntactic sugar where [[1, 2, 3]] is equivalent to ["array", 1, 2, 3].
+        if (first is JSONArray && jsonArray.length() == 1) {
+            return first
+        }
+
+        val functionName = first as String
         val function = closure[functionName]
 
         require(function is JLispFunction<*>) {
