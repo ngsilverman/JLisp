@@ -1,9 +1,9 @@
 package com.nathanaelsilverman.jlisp
 
-internal interface JLispFunction<out R> {
+interface JLispFunction<out R> {
 
     /**
-     * For a given implementation, should always return the same value ([true] or [false]).
+     * For a given implementation, should always return the same value (`true` or `false`).
      */
     fun evaluateParameters() = true
 

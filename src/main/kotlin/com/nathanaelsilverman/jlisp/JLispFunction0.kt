@@ -1,6 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
-internal interface JLispFunction0<out R> : JLispFunction<R> {
+interface JLispFunction0<out R> : JLispFunction<R> {
 
     fun call(): R
 

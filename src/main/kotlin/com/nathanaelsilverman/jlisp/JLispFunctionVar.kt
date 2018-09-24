@@ -1,6 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
-internal interface JLispFunctionVar<out R> : JLispFunction<R> {
+interface JLispFunctionVar<out R> : JLispFunction<R> {
 
     fun call(args: List<Any?>): R
 

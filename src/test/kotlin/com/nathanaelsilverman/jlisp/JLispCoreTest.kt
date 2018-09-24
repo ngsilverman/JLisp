@@ -12,8 +12,6 @@ class JLispCoreTest {
 
     private fun Any?.eval() = processor.eval(this)
 
-    private fun Any?.eval(closure: JLispClosure) = processor.eval(this, closure)
-
     @BeforeEach
     fun beforeEach() {
         processor = JLispProcessor()
