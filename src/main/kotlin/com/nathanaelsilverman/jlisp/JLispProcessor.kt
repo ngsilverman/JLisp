@@ -26,7 +26,6 @@ class JLispProcessor {
         return when (value) {
             is JSONArray -> evalJsonArray(value, closure)
             is String -> evalString(value, closure)
-            JSONObject.NULL -> null
             else -> value
         }
     }

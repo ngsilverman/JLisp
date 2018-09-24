@@ -25,7 +25,7 @@ class JLispProcessorTest {
 
     @Test
     fun evalJsonObjectNull() {
-        assertEquals(null, JSONObject.NULL.eval())
+        assertEquals(JSONObject.NULL, JSONObject.NULL.eval())
     }
 
     @Test

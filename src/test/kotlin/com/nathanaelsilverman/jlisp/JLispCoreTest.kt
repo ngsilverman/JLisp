@@ -1,6 +1,7 @@
 package com.nathanaelsilverman.jlisp
 
 import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +26,7 @@ class JLispCoreTest {
 
     @Test
     fun evalNull() {
-        assertEquals(null, """["eval", null]""".jsonArray().eval())
+        assertEquals(JSONObject.NULL, """["eval", null]""".jsonArray().eval())
     }
 
     @Test
