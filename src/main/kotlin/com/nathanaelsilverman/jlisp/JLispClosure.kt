@@ -1,3 +1,3 @@
 package com.nathanaelsilverman.jlisp
 
-typealias JLispClosure = Map<String, Any?>
+internal typealias JLispClosure = Map<String, Any?>

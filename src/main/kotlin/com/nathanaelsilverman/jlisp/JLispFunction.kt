@@ -1,6 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
-interface JLispFunction<out R> {
+internal interface JLispFunction<out R> {
 
     fun evaluateParameters() = true
 
