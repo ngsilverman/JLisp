@@ -1,6 +1,5 @@
 package com.nathanaelsilverman.jlisp
 
-import org.json.JSONArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -9,7 +8,9 @@ class JLispProcessorTest {
 
     private lateinit var processor: JLispProcessor
 
-    private fun String.eval() = processor.eval(JSONArray(this))
+    private fun Any?.eval() = processor.eval(this)
+
+    private fun Any?.eval(closure: JLispClosure) = processor.eval(this, closure)
 
     @BeforeEach
     fun beforeEach() {
@@ -18,63 +19,44 @@ class JLispProcessorTest {
 
     @Test
     fun evalNull() {
-        assertEquals(null, processor.eval(null))
+        assertEquals(null, null.eval())
     }
 
     @Test
     fun evalString() {
-        assertEquals("Hello, world!", processor.eval("Hello, world!"))
+        assertEquals("Hello, world!", "Hello, world!".eval())
     }
 
     @Test
     fun evalFunction() {
-        assertEquals(Print, processor.eval(Print))
+        assertEquals(Print, Print.eval())
     }
 
     @Test
-    fun evalPlusInt2Parameters() {
-        assertEquals(2, """["+", 1, 1]""".eval())
-    }
-
-    @Test
-    fun evalPlusInt3Parameters() {
-        assertEquals(3, """["+", 1, 1, 1]""".eval())
-    }
-
-    /**
-     * The return value of the let isn't using '%'s, so it's returning the actual string "variable" rather than the
-     * value of the "variable" variable.
-     */
-    @Test
-    fun evalLetNoPercent() {
-        assertEquals("variable", """["let", ["variable", 7], "variable"]""".eval())
-    }
-
-    @Test
-    fun evalLet() {
-        assertEquals(7, """["let", ["variable", 7], "%variable%"]""".eval())
+    fun variable() {
+        assertEquals(7, "%variable%".eval(mapOf("variable" to 7)))
     }
 
     /**
      * Escaping the first '%' makes it possible to return a variable name as a string.
      */
     @Test
-    fun evalLetPercentString() {
-        assertEquals("%variable%", """["let", ["variable", 7], "/%variable%"]""".eval())
+    fun stringPercent() {
+        assertEquals("%variable%", "/%variable%".eval())
     }
 
     @Test
-    fun evalLetBackPercentString() {
-        assertEquals("/%variable%", """["let", ["variable", 7], "//%variable%"]""".eval())
+    fun stringBackPercent() {
+        assertEquals("/%variable%", "//%variable%".eval())
     }
 
     @Test
-    fun evalLetSinglePercent() {
-        assertEquals("%", """["let", ["variable", 7], "%"]""".eval())
+    fun stringSinglePercent() {
+        assertEquals("%", "%".eval())
     }
 
     @Test
-    fun evalLetDoublePercent() {
-        assertEquals("%%", """["let", ["variable", 7], "%%"]""".eval())
+    fun stringDoublePercent() {
+        assertEquals("%%", "%%".eval())
     }
 }
