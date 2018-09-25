@@ -19,4 +19,6 @@ class JLispProcessor(
     internal fun eval(value: Any?, closure: JLispClosure): Any? {
         return eval.call(this, closure, listOf(value))
     }
+
+    fun read(string: String): Any? = string.read()
 }

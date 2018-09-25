@@ -59,6 +59,9 @@ internal object Eval : JLispFunction<Any?> {
         return function.call(processor, closure, arguments)
     }
 
+    /**
+     * Strings need to be evaluated because they can be variables.
+     */
     private fun evalString(string: String, closure: JLispClosure): Any? {
         return when {
             string.startsWith('%') -> {

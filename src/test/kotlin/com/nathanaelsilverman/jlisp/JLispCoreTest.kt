@@ -10,7 +10,8 @@ class JLispCoreTest {
 
     private lateinit var processor: JLispProcessor
 
-    private fun Any?.eval() = processor.eval(this)
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> String.readEval(): T = processor.eval(this.read()) as T
 
     @BeforeEach
     fun beforeEach() {
@@ -19,46 +20,46 @@ class JLispCoreTest {
 
     @Test
     fun array() {
-        assertEquals(listOf(1, 2, 3), ("""["array", 1, 2, 3]""".jsonArray().eval() as JSONArray).toList())
+        assertJsonArraysEquals(JSONArray(listOf(1, 2, 3)), """["array", 1, 2, 3]""".readEval())
     }
 
     @Test
     fun arraySyntacticSugar() {
-        assertEquals(listOf(1, 2, 3), ("""[[1, 2, 3]]""".jsonArray().eval() as JSONArray).toList())
+        assertJsonArraysEquals(JSONArray(listOf(1, 2, 3)), """[[1, 2, 3]]""".readEval())
     }
 
     @Test
     fun evalNull() {
-        assertEquals(JSONObject.NULL, """["eval", null]""".jsonArray().eval())
+        assertEquals(JSONObject.NULL, """["eval", null]""".readEval())
     }
 
     @Test
     fun evalString() {
-        assertEquals("Hello, world!", """["eval", "Hello, world!"]""".jsonArray().eval())
+        assertEquals("Hello, world!", """["eval", "Hello, world!"]""".readEval())
     }
 
     @Test
     fun evalObject() {
-        assertJsonObjectsEquals(JSONObject("""{"key": 2}"""), """["eval", {"key": ["+", 1, 1]}]""".jsonArray().eval() as JSONObject)
+        assertJsonObjectsEquals(JSONObject("""{"key": 2}"""), """["eval", {"key": ["+", 1, 1]}]""".readEval())
     }
 
     @Test
     fun let() {
-        assertEquals(7, """["let", ["variable", 7], "%variable"]""".jsonArray().eval())
+        assertEquals(7, """["let", ["variable", 7], "%variable"]""".readEval())
     }
 
     @Test
     fun map() {
-        assertEquals(listOf(2, 3, 4), ("""["map", ["fn", ["+", "%", 1]], ["array", 1, 2, 3]]""".jsonArray().eval() as JSONArray).toList())
+        assertJsonArraysEquals(JSONArray(listOf(2, 3, 4)), """["map", ["fn", ["+", "%", 1]], ["array", 1, 2, 3]]""".readEval())
     }
 
     @Test
     fun plusInt2Parameters() {
-        assertEquals(2, """["+", 1, 1]""".jsonArray().eval())
+        assertEquals(2, """["+", 1, 1]""".readEval())
     }
 
     @Test
     fun plusInt3Parameters() {
-        assertEquals(3, """["+", 1, 1, 1]""".jsonArray().eval())
+        assertEquals(3, """["+", 1, 1, 1]""".readEval())
     }
 }
