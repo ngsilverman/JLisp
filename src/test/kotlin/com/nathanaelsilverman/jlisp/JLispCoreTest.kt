@@ -38,6 +38,11 @@ class JLispCoreTest {
     }
 
     @Test
+    fun evalObject() {
+        assertJsonObjectsEquals(JSONObject("""{"key": 2}"""), """["eval", {"key": ["+", 1, 1]}]""".jsonArray().eval() as JSONObject)
+    }
+
+    @Test
     fun let() {
         assertEquals(7, """["let", ["variable", 7], "%variable"]""".jsonArray().eval())
     }

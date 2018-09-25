@@ -1,6 +1,7 @@
 package com.nathanaelsilverman.jlisp
 
 import org.json.JSONArray
+import org.json.JSONObject
 
 internal object Eval : JLispFunction<Any?> {
 
@@ -14,8 +15,17 @@ internal object Eval : JLispFunction<Any?> {
     private fun eval(processor: JLispProcessor, closure: JLispClosure, value: Any?): Any? {
         return when (value) {
             is JSONArray -> evalJsonArray(processor, closure, value)
+            is JSONObject -> evalJsonObject(processor, closure, value)
             is String -> evalString(value, closure)
             else -> value
+        }
+    }
+
+    private fun evalJsonObject(processor: JLispProcessor, closure: JLispClosure, jsonObject: JSONObject): JSONObject {
+        return jsonObject.copy().apply {
+            keys().forEach { key ->
+                put(key, eval(processor, closure, jsonObject[key]))
+            }
         }
     }
 
