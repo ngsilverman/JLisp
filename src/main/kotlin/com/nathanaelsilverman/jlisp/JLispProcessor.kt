@@ -3,6 +3,7 @@ package com.nathanaelsilverman.jlisp
 class JLispProcessor(
     private val eval: JLispFunction<Any?> = Eval,
     private val coreClosure: JLispClosure = mapOf<String, JLispFunction<*>>(
+        "=" to Equals,
         "+" to plus,
         "-" to minus,
         "*" to times,

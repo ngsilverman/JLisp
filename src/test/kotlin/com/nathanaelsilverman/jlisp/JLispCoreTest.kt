@@ -27,6 +27,11 @@ class JLispCoreTest {
     }
 
     @Test
+    fun equals() {
+        assertEquals(true, """["=", 1, 1]""".readEval())
+    }
+
+    @Test
     fun evalNull() {
         assertEquals(null, """["eval", null]""".readEval())
     }

@@ -1,8 +1,23 @@
 package com.nathanaelsilverman.jlisp
 
-import org.json.simple.JSONArray
 import java.math.BigDecimal
-import kotlin.reflect.KFunction
+
+internal object Equals : JLispFunctionVar<Boolean> {
+    override fun call(args: List<Any?>): Boolean {
+        require(args.size >= 2)
+
+        var first = args.first()
+        args.drop(1)
+            .forEach {
+                if (first != it) {
+                    return false
+                }
+                first = it
+            }
+
+        return true
+    }
+}
 
 internal object Eval : JLispFunction<Any?> {
 
