@@ -1,6 +1,8 @@
 package com.nathanaelsilverman.jlisp
 
 import org.json.simple.JSONArray
+import java.math.BigDecimal
+import kotlin.reflect.KFunction
 
 internal object Eval : JLispFunction<Any?> {
 
@@ -135,75 +137,37 @@ internal object Let : JLispMacro<Any?> {
     }
 }
 
-internal object Plus : JLispFunctionVar<Any> {
-    override fun call(args: List<Any?>): Any {
+internal class BigDecimalReducer(private val function: BigDecimal.(BigDecimal) -> BigDecimal) :
+    JLispFunctionVar<Number> {
+    override fun call(args: List<Any?>): Number {
         require(args.isNotEmpty())
 
-        val first = args[0]!!
+        val result = args
+            .asSequence()
+            .map {
+                require(it is Number) {
+                    "Not a number: \"$it\"."
+                }
+                // We convert the numbers to strings for BigDecimal to use the appropriate precision.
+                BigDecimal(it.toString())
+            }
+            .reduce { acc, value -> acc.function(value) }
 
-        if (args.size == 1) return first
-
-        val rest = call(args.drop(1))
-
-        return when (first) {
-            is Byte -> when (rest) {
-                is Byte -> first + rest
-                is Short -> first + rest
-                is Int -> first + rest
-                is Long -> first + rest
-                is Float -> first + rest
-                is Double -> first + rest
-                else -> error("Not a number.")
-            }
-            is Short -> when (rest) {
-                is Byte -> first + rest
-                is Short -> first + rest
-                is Int -> first + rest
-                is Long -> first + rest
-                is Float -> first + rest
-                is Double -> first + rest
-                else -> error("Not a number.")
-            }
-            is Int -> when (rest) {
-                is Byte -> first + rest
-                is Short -> first + rest
-                is Int -> first + rest
-                is Long -> first + rest
-                is Float -> first + rest
-                is Double -> first + rest
-                else -> error("Not a number.")
-            }
-            is Long -> when (rest) {
-                is Byte -> first + rest
-                is Short -> first + rest
-                is Int -> first + rest
-                is Long -> first + rest
-                is Float -> first + rest
-                is Double -> first + rest
-                else -> error("Not a number.")
-            }
-            is Float -> when (rest) {
-                is Byte -> first + rest
-                is Short -> first + rest
-                is Int -> first + rest
-                is Long -> first + rest
-                is Float -> first + rest
-                is Double -> first + rest
-                else -> error("Not a number.")
-            }
-            is Double -> when (rest) {
-                is Byte -> first + rest
-                is Short -> first + rest
-                is Int -> first + rest
-                is Long -> first + rest
-                is Float -> first + rest
-                is Double -> first + rest
-                else -> error("Not a number.")
-            }
-            else -> error("Not a number.")
+        return if (result.scale() > 0) {
+            result.toDouble()
+        } else {
+            result.toLong()
         }
     }
 }
+
+internal val plus = BigDecimalReducer { plus(it) }
+
+internal val minus = BigDecimalReducer { minus(it) }
+
+internal val times = BigDecimalReducer { times(it) }
+
+internal val div = BigDecimalReducer { div(it) }
 
 internal object Print : JLispFunction1<String, Unit> {
     override fun call(p1: String) = print(p1)
