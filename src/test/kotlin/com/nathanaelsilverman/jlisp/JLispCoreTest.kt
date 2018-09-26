@@ -52,6 +52,43 @@ class JLispCoreTest {
     }
 
     @Test
+    fun ifTrue() {
+        assertEquals(1, """["if", true, 1, 2]""".readEval())
+    }
+
+    @Test
+    fun ifTruthy() {
+        assertEquals(1, """["if", [[4, 5, 6]], 1, 2]""".readEval())
+    }
+
+    @Test
+    fun ifFalseFalse() {
+        assertEquals(2, """["if", false, 1, 2]""".readEval())
+    }
+
+    @Test
+    fun ifFalseNil() {
+        assertEquals(2, """["if", null, 1, 2]""".readEval())
+    }
+
+
+    /**
+     * Tests that the condition parameter is evaluated.
+     */
+    @Test
+    fun ifEvalCondition() {
+        assertEquals(1, """["if", ["=", 1, 1], 1, 2]""".readEval())
+    }
+
+    /**
+     * Tests that the conditionally chosen parameter is evaluated.
+     */
+    @Test
+    fun ifEvalParam() {
+        assertEquals(2, """["if", false, 1, ["+", 1, 1]]""".readEval())
+    }
+
+    @Test
     fun map() {
         assertEquals(listOf(2L, 3L, 4L), """["map", ["fn", ["+", "%", 1]], ["array", 1, 2, 3]]""".readEval())
     }

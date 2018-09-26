@@ -12,6 +12,7 @@ class JLispProcessor(
         "eval" to Eval,
         "fn" to Fn,
         "let" to Let,
+        "if" to If,
         "map" to JMap,
         "print" to Print,
         "println" to PrintLn

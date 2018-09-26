@@ -152,8 +152,30 @@ internal object Let : JLispMacro<Any?> {
     }
 }
 
-internal class BigDecimalReducer(private val function: BigDecimal.(BigDecimal) -> BigDecimal) :
-    JLispFunctionVar<Number> {
+internal object If : JLispFunction<Any?> {
+
+    override fun evaluateParameters() = false
+
+    override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
+        require(args.size == 3) {
+            "Wrong number of arguments."
+        }
+
+        val condition = processor.eval(args[0], closure)
+        return processor.eval(
+            if (condition.isTruthy()) {
+                args[1]
+            } else {
+                args[2]
+            },
+            closure
+        )
+    }
+}
+
+internal class BigDecimalReducer(
+    private val function: BigDecimal.(BigDecimal) -> BigDecimal
+) : JLispFunctionVar<Number> {
     override fun call(args: List<Any?>): Number {
         require(args.isNotEmpty())
 
