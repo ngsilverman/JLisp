@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'org.json:json:20180813'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
 
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
 }

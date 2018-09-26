@@ -1,7 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
 
 internal object Eval : JLispFunction<Any?> {
 
@@ -14,26 +13,22 @@ internal object Eval : JLispFunction<Any?> {
 
     private fun eval(processor: JLispProcessor, closure: JLispClosure, value: Any?): Any? {
         return when (value) {
-            is JSONArray -> evalJsonArray(processor, closure, value)
-            is JSONObject -> evalJsonObject(processor, closure, value)
+            is List<*> -> evalList(processor, closure, value)
+            is Map<*, *> -> evalMap(processor, closure, value)
             is String -> evalString(value, closure)
             else -> value
         }
     }
 
-    private fun evalJsonObject(processor: JLispProcessor, closure: JLispClosure, jsonObject: JSONObject): JSONObject {
-        return jsonObject.copy().apply {
-            keys().forEach { key ->
-                put(key, eval(processor, closure, jsonObject[key]))
-            }
-        }
+    private fun evalMap(processor: JLispProcessor, closure: JLispClosure, map: Map<*, *>): Map<*, *> {
+        return map.mapValues { (_, value) -> eval(processor, closure, value) }
     }
 
-    private fun evalJsonArray(processor: JLispProcessor, closure: JLispClosure, jsonArray: JSONArray): Any? {
-        val first = jsonArray[0]
+    private fun evalList(processor: JLispProcessor, closure: JLispClosure, list: List<*>): Any? {
+        val first = list[0]
 
         // Enables the syntactic sugar where [[1, 2, 3]] is equivalent to ["array", 1, 2, 3].
-        if (first is JSONArray && jsonArray.length() == 1) {
+        if (first is List<*> && list.size == 1) {
             return first
         }
 
@@ -45,16 +40,17 @@ internal object Eval : JLispFunction<Any?> {
         }
         function as JLispFunction<*>
 
-        val arguments = (1 until jsonArray.length())
-                .map { index ->
-                    jsonArray[index].let {
-                        if (function.evaluateParameters()) {
-                            eval(processor, closure, it)
-                        } else {
-                            it
-                        }
-                    }
+        val arguments = list
+            .asSequence()
+            .drop(1)
+            .map {
+                if (function.evaluateParameters()) {
+                    eval(processor, closure, it)
+                } else {
+                    it
                 }
+            }
+            .toList()
 
         return function.call(processor, closure, arguments)
     }
@@ -102,52 +98,38 @@ internal object Fn : JLispFunction1<Any?, JLispFunction<Any?>> {
 /**
  * Had to prepend a 'J' not to conflict with [Array].
  */
-internal object JArray : JLispFunctionVar<JSONArray> {
-    override fun call(args: List<Any?>) = JSONArray().apply {
-        args.forEach { put(it) }
-    }
+internal object JArray : JLispFunctionVar<List<*>> {
+    override fun call(args: List<Any?>) = args
 }
 
 /**
  * Had to prepend a 'J' not to conflict with [Map].
  */
-internal object JMap : JLispFunction<JSONArray?> {
-    override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): JSONArray? {
+internal object JMap : JLispFunction<List<*>?> {
+    override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): List<*>? {
         // We expect the function to take a single parameter, but we can't rely on it implementing [JLispFunction1]
         // because [Fn] returns a generic [JLispFunction].
         val function = args[0] as JLispFunction<Any?>
-        val array = args[1] as JSONArray?
-        return if (array == null) {
-            null
-        } else {
-            JSONArray().apply {
-                (0 until array.length()).forEach { index ->
-                    val mappedValue = function.call(processor, closure, listOf(array[index]))
-                    put(mappedValue)
-                }
-            }
-        }
+        val array = args[1] as List<Any?>?
+        return array?.map { function.call(processor, closure, listOf(it)) }
     }
 }
 
 internal object Let : JLispMacro<Any?> {
     override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
-        val bindings = args[0] as JSONArray
-        require(bindings.length() % 2 == 0)
+        val bindings = args[0] as List<Any?>
+        require(bindings.size % 2 == 0)
         val expression: Any? = args[1]
 
         var letClosure = closure
 
-        (0 until (bindings.length() / 2))
-                .map {
-                    val keyIndex = it * 2
-                    val key = bindings[keyIndex] as String
-                    key to bindings[keyIndex + 1]
-                }
-                .forEach { (key, value) ->
-                    val binding = key to processor.eval(value, letClosure)
-                    letClosure += binding
-                }
+        bindings.asSequence()
+            .chunked(2)
+            .map { it[0] as String to it[1] }
+            .forEach { (key, value) ->
+                val binding = key to processor.eval(value, letClosure)
+                letClosure += binding
+            }
 
         return processor.eval(expression, letClosure)
     }

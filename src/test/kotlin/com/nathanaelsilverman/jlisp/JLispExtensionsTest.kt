@@ -1,7 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.parser.ParseException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -10,12 +9,12 @@ class JLispExtensionsTest {
 
     @Test
     fun readArray() {
-        assertJsonArraysEquals(JSONArray(listOf(1, 2, 3)), """[1, 2, 3]""".read())
+        assertEquals(listOf(1L, 2L, 3L), """[1, 2, 3]""".read())
     }
 
     @Test
     fun readObject() {
-        assertJsonObjectsEquals(JSONObject(mapOf("key" to 2)), """{"key": 2}""".read())
+        assertEquals(mapOf("key" to 2L), """{"key": 2}""".read())
     }
 
     @Test
@@ -35,7 +34,7 @@ class JLispExtensionsTest {
 
     @Test
     fun readNull() {
-        assertEquals(JSONObject.NULL, "null".read())
+        assertEquals(null, "null".read())
     }
 
     /**
@@ -43,7 +42,15 @@ class JLispExtensionsTest {
      */
     @Test
     fun readTrim() {
-        assertEquals(JSONObject.NULL, " null  ".read())
+        assertEquals(null, " null  ".read())
+    }
+
+    /**
+     * Tests that new lines are ignored.
+     */
+    @Test
+    fun readTrimNewLines() {
+        assertEquals(null, "\nnull\n".read())
     }
 
     @Test
@@ -68,7 +75,7 @@ class JLispExtensionsTest {
 
     @Test
     fun readInvalid() {
-        assertThrows<IllegalArgumentException> {
+        assertThrows<ParseException> {
             "invalid".read<Nothing>()
         }
     }

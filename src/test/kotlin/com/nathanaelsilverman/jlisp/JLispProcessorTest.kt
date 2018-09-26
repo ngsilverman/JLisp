@@ -1,6 +1,5 @@
 package com.nathanaelsilverman.jlisp
 
-import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,11 +20,6 @@ class JLispProcessorTest {
     @Test
     fun evalNull() {
         assertEquals(null, null.eval())
-    }
-
-    @Test
-    fun evalJsonObjectNull() {
-        assertEquals(JSONObject.NULL, JSONObject.NULL.eval())
     }
 
     @Test

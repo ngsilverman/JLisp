@@ -1,7 +1,5 @@
 package com.nathanaelsilverman.jlisp
 
-import org.json.JSONArray
-import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,17 +18,17 @@ class JLispCoreTest {
 
     @Test
     fun array() {
-        assertJsonArraysEquals(JSONArray(listOf(1, 2, 3)), """["array", 1, 2, 3]""".readEval())
+        assertEquals(listOf(1L, 2L, 3L), """["array", 1, 2, 3]""".readEval())
     }
 
     @Test
     fun arraySyntacticSugar() {
-        assertJsonArraysEquals(JSONArray(listOf(1, 2, 3)), """[[1, 2, 3]]""".readEval())
+        assertEquals(listOf(1L, 2L, 3L), """[[1, 2, 3]]""".readEval())
     }
 
     @Test
     fun evalNull() {
-        assertEquals(JSONObject.NULL, """["eval", null]""".readEval())
+        assertEquals(null, """["eval", null]""".readEval())
     }
 
     @Test
@@ -40,7 +38,7 @@ class JLispCoreTest {
 
     @Test
     fun evalObject() {
-        assertJsonObjectsEquals(JSONObject("""{"key": 2}"""), """["eval", {"key": ["+", 1, 1]}]""".readEval())
+        assertEquals(mapOf("key" to 2L), """["eval", {"key": ["+", 1, 1]}]""".readEval())
     }
 
     @Test
@@ -50,7 +48,7 @@ class JLispCoreTest {
 
     @Test
     fun map() {
-        assertJsonArraysEquals(JSONArray(listOf(2, 3, 4)), """["map", ["fn", ["+", "%", 1]], ["array", 1, 2, 3]]""".readEval())
+        assertEquals(listOf(2L, 3L, 4L), """["map", ["fn", ["+", "%", 1]], ["array", 1, 2, 3]]""".readEval())
     }
 
     @Test
