@@ -27,7 +27,7 @@ class IfTest : BaseTest() {
     }
 
     /**
-     * Tests that the condition parameter is evaluated.
+     * Tests that the condition argument is evaluated.
      */
     @Test
     fun ifEvalCondition() {
@@ -35,10 +35,10 @@ class IfTest : BaseTest() {
     }
 
     /**
-     * Tests that the conditionally chosen parameter is evaluated.
+     * Tests that the conditionally chosen argument is evaluated.
      */
     @Test
-    fun ifEvalParam() {
+    fun ifEvalArg() {
         assertEquals(2, """["if", false, 1, ["+", 1, 1]]""".readEval())
     }
 }

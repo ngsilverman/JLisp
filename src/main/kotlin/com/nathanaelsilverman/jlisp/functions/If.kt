@@ -7,7 +7,7 @@ import com.nathanaelsilverman.jlisp.isTruthy
 
 internal object If : JLispFunction<Any?> {
 
-    override fun evaluateParameters() = false
+    override fun evaluateArguments() = false
 
     override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
         require(args.size == 3) {

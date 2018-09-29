@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test
 class MathTest : BaseTest() {
 
     @Test
-    fun plus2Parameters() {
+    fun plus2Arguments() {
         assertEquals(2, """["+", 1, 1]""".readEval())
     }
 
     @Test
-    fun plus3Parameters() {
+    fun plus3Arguments() {
         assertEquals(3, """["+", 1, 1, 1]""".readEval())
     }
 

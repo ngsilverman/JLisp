@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Test
 class StrTest : BaseTest() {
 
     @Test
-    fun strNoParameters() {
+    fun strNoArguments() {
         assertEquals("", """["str"]""".readEval())
     }
 
     @Test
-    fun strNullParameter() {
+    fun strNullArgument() {
         assertEquals("null", """["str", null]""".readEval())
     }
 
     @Test
-    fun strSingleParameter() {
+    fun strSingleArgument() {
         assertEquals("Hello", """["str", "Hello"]""".readEval())
     }
 
@@ -27,7 +27,7 @@ class StrTest : BaseTest() {
     }
 
     @Test
-    fun strIntegerParameter() {
+    fun strIntegerArgument() {
         assertEquals("Hello, 7 world!", """["str", "Hello, ", 7, " world!"]""".readEval())
     }
 }

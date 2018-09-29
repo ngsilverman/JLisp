@@ -6,7 +6,7 @@ import com.nathanaelsilverman.jlisp.JLispProcessor
 
 internal object Eval : JLispFunction<Any?> {
 
-    override fun evaluateParameters() = false
+    override fun evaluateArguments() = false
 
     override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
         val expression: Any? = args[0]
@@ -52,7 +52,7 @@ internal object Eval : JLispFunction<Any?> {
             .asSequence()
             .drop(1)
             .map {
-                if (function.evaluateParameters()) {
+                if (function.evaluateArguments()) {
                     eval(processor, closure, it)
                 } else {
                     it
