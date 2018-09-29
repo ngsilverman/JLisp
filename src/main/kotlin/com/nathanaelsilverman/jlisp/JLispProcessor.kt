@@ -17,9 +17,10 @@ class JLispProcessor(
         "if" to If,
         "loop" to Loop,
         "map" to JMap,
-        "quote" to Quote,
         "print" to Print,
-        "println" to PrintLn
+        "println" to PrintLn,
+        "quote" to Quote,
+        "str" to Str
     )
 ) {
 
