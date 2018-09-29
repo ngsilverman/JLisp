@@ -23,4 +23,21 @@ class LoopTest : BaseTest() {
                 """.readEval()
         )
     }
+
+    /**
+     * Without loop's tail recursion optimization this would result in a StackOverflow exception.
+     */
+    @Test
+    fun tailRecursion() {
+        assertEquals(
+            "a".repeat(10000),
+            """
+                ["loop", ["result", "a",
+                          "continue", 10000],
+                  ["if", ["=", "%continue", 1],
+                    "%result",
+                    ["recur", ["str", "%result", "a"], ["-", "%continue", 1]]]]
+                """.readEval()
+        )
+    }
 }
