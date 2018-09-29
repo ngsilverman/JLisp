@@ -1,5 +1,6 @@
 package com.nathanaelsilverman.jlisp
 
+import com.nathanaelsilverman.jlisp.functions.Print
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

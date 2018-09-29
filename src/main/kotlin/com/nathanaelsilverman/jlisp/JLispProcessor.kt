@@ -1,5 +1,7 @@
 package com.nathanaelsilverman.jlisp
 
+import com.nathanaelsilverman.jlisp.functions.*
+
 class JLispProcessor(
     private val eval: JLispFunction<Any?> = Eval,
     private val coreClosure: JLispClosure = mapOf<String, JLispFunction<*>>(
