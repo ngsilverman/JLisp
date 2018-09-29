@@ -44,7 +44,7 @@ internal object Eval : JLispFunction<Any?> {
     private fun evalList(processor: JLispProcessor, closure: JLispClosure, list: List<*>): Any? {
         val first = list[0]
 
-        // Enables the syntactic sugar where [[1, 2, 3]] is equivalent to ["array", 1, 2, 3].
+        // Enables the syntactic sugar where [[1, 2, 3]] is equivalent to ["quote", 1, 2, 3].
         if (first is List<*> && list.size == 1) {
             return first
         }
@@ -212,4 +212,13 @@ internal object Print : JLispFunction1<String, Unit> {
 
 internal object PrintLn : JLispFunction1<String, Unit> {
     override fun call(p1: String) = println(p1)
+}
+
+internal object Quote : JLispFunction1<Any?, Any?> {
+
+    override fun evaluateParameters() = false
+
+    override fun call(p1: Any?): Any? {
+        return p1
+    }
 }

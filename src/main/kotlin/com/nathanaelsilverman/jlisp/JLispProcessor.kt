@@ -14,6 +14,7 @@ class JLispProcessor(
         "let" to Let,
         "if" to If,
         "map" to JMap,
+        "quote" to Quote,
         "print" to Print,
         "println" to PrintLn
     )
