@@ -10,6 +10,7 @@ class JLispProcessor(
         "-" to minus,
         "*" to times,
         "/" to div,
+        "->" to ThreadFist,
         "array" to JArray,
         "eval" to Eval,
         "fn" to Fn,
