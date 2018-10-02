@@ -1,20 +1,17 @@
 package com.nathanaelsilverman.jlisp.functions
 
-import com.nathanaelsilverman.jlisp.JLispFunctionVar
+import com.nathanaelsilverman.jlisp.JLispFunction0Var
 import java.math.BigDecimal
 
 internal class BigDecimalReducer(
     private val function: BigDecimal.(BigDecimal) -> BigDecimal
-) : JLispFunctionVar<Number> {
-    override fun call(args: List<Any?>): Number {
+) : JLispFunction0Var<Number, Number> {
+    override fun call(args: List<Number>): Number {
         require(args.isNotEmpty())
 
         val result = args
             .asSequence()
             .map {
-                require(it is Number) {
-                    "Not a number: \"$it\"."
-                }
                 // We convert the numbers to strings for BigDecimal to use the appropriate precision.
                 BigDecimal(it.toString())
             }
@@ -35,4 +32,3 @@ internal val minus = BigDecimalReducer { minus(it) }
 internal val times = BigDecimalReducer { times(it) }
 
 internal val div = BigDecimalReducer { div(it) }
-

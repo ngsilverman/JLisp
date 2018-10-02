@@ -1,8 +1,8 @@
 package com.nathanaelsilverman.jlisp.functions
 
-import com.nathanaelsilverman.jlisp.JLispFunctionVar
+import com.nathanaelsilverman.jlisp.JLispFunction0Var
 
-internal object Equals : JLispFunctionVar<Boolean> {
+internal object Equals : JLispFunction0Var<Any?, Boolean> {
     override fun call(args: List<Any?>): Boolean {
         require(args.size >= 2)
 
