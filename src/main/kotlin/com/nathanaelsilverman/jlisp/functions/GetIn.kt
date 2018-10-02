@@ -8,20 +8,15 @@ import com.nathanaelsilverman.jlisp.JLispFunction2
 internal object GetIn : JLispFunction2<Any?, List<Any>, Any?> {
     @Suppress("UNCHECKED_CAST", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun call(structure: Any?, keys: List<Any>): Any? {
-        return when (structure) {
-            is List<*> -> {
-                keys as List<Int>
-                keys.fold(structure as Any?) { acc, value ->
-                    (acc as List<Any?>)[value]
+        return keys.fold(structure) { acc, key ->
+            when (acc) {
+                is List<*> -> acc[(key as Long).toInt()]
+                is Map<*, *> -> acc[key]
+                else -> {
+                    val className = if (acc != null) acc::class.java.simpleName else "null"
+                    throw IllegalArgumentException("Could not get value from $className, only arrays and objects are supported. ")
                 }
             }
-            is Map<*, *> -> {
-                keys as List<String>
-                keys.fold(structure as Any?) { acc, value ->
-                    (acc as Map<String, Any?>)[value]
-                }
-            }
-            else -> throw IllegalArgumentException("get-in's first argument must be a list or a map.")
         }
     }
 }

@@ -25,4 +25,9 @@ class GetInTest : BaseTest() {
     fun getInObjectMultipleKeys() {
         assertEquals(7, """["get-in", {"first": {"second": 7}}, [["first", "second"]]]""".readEval())
     }
+
+    @Test
+    fun getInMix() {
+        assertEquals(3, """["get-in", {"first": [[1, 2, 3]]}, [["first", 2]]]""".readEval())
+    }
 }
