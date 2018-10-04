@@ -1,3 +1,5 @@
+@file:Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+
 package com.nathanaelsilverman.jlisp.functions
 
 import com.nathanaelsilverman.jlisp.JLispClosure
@@ -9,16 +11,20 @@ internal object Fn : JLispFunction1<Any?, JLispFunction<Any?>> {
 
     override fun evaluateArguments() = false
 
-    override fun call(p1: Any?): JLispFunction<Any?> {
+    override fun call(expression: Any?): JLispFunction<Any?> {
+
         return object : JLispFunction<Any?> {
+
             override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
-                var functionClosure = closure
-                args.forEachIndexed { index, arg ->
-                    // Arguments are bound to indexed variables starting with 1.
-                    val binding = (index + 1).toString() to arg
-                    functionClosure += binding
-                }
-                return processor.eval(p1, functionClosure)
+
+                val functionClosure = closure.plus(
+                    args.mapIndexed { index, arg ->
+                        // Arguments are bound to indexed variables starting with 1.
+                        (index + 1).toString() to arg
+                    }
+                )
+
+                return processor.eval(expression, functionClosure)
             }
         }
     }
