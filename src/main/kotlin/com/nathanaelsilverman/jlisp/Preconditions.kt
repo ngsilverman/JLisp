@@ -20,3 +20,9 @@ fun requireArgs(
         "Invalid argument count. Expected at most $maxCount but got $count."
     }
 }
+
+inline fun <reified T> requireIs(any: Any?) {
+    require(any is T) {
+        "Invalid type. Expected $any to be of type ${T::class.java.canonicalName} but was ${any!!::class.java.canonicalName}"
+    }
+}

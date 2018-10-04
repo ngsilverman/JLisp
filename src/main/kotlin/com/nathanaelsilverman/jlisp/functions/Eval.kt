@@ -1,14 +1,12 @@
 package com.nathanaelsilverman.jlisp.functions
 
-import com.nathanaelsilverman.jlisp.JLispClosure
-import com.nathanaelsilverman.jlisp.JLispFunction
-import com.nathanaelsilverman.jlisp.JLispProcessor
+import com.nathanaelsilverman.jlisp.*
 
 internal object Eval : JLispFunction<Any?> {
 
-    override fun evaluateArguments() = false
-
     override fun call(processor: JLispProcessor, closure: JLispClosure, args: List<Any?>): Any? {
+        requireArgs(args, exactCount = 1)
+
         val expression: Any? = args[0]
         return eval(processor, closure, expression)
     }
@@ -23,13 +21,7 @@ internal object Eval : JLispFunction<Any?> {
     }
 
     private fun evalMap(processor: JLispProcessor, closure: JLispClosure, map: Map<*, *>): Map<*, *> {
-        return map.mapValues { (_, value) ->
-            eval(
-                processor,
-                closure,
-                value
-            )
-        }
+        return map.mapValues { (_, value) -> eval(processor, closure, value) }
     }
 
     private fun evalList(processor: JLispProcessor, closure: JLispClosure, list: List<*>): Any? {
@@ -40,27 +32,32 @@ internal object Eval : JLispFunction<Any?> {
             return first
         }
 
-        val functionName = first as String
-        val function = closure[functionName]
+        // The first element of a form is evaluated before attempting to resolve it to a function. This means forms can
+        // start with an expression which returns a function or a string referencing a function.
+        val firstEvaluated = eval(processor, closure, first)
 
-        require(function is JLispFunction<*>) {
-            "$functionName is not a function."
+        val function = when (firstEvaluated) {
+            is JLispFunction<*> -> firstEvaluated
+            is String -> closure[firstEvaluated].let {
+                requireIs<JLispFunction<*>>(it)
+                it as JLispFunction<*>
+            }
+            else -> throw IllegalArgumentException("Forms must begin with a function.")
         }
-        function as JLispFunction<*>
 
-        val arguments = list
+        val args = list
             .asSequence()
             .drop(1)
-            .map {
+            .let { args ->
                 if (function.evaluateArguments()) {
-                    eval(processor, closure, it)
+                    args.map { eval(processor, closure, it) }
                 } else {
-                    it
+                    args
                 }
             }
             .toList()
 
-        return function.call(processor, closure, arguments)
+        return function.call(processor, closure, args)
     }
 
     /**
