@@ -30,4 +30,14 @@ class GetInTest : BaseTest() {
     fun getInMix() {
         assertEquals(3, """["get-in", {"first": [[1, 2, 3]]}, [["first", 2]]]""".readEval())
     }
+
+    @Test
+    fun getInArrayKeyNotFound() {
+        assertEquals(null, """["get-in", [[1, 2, 3]], [[5]]]""".readEval())
+    }
+
+    @Test
+    fun getInArrayKeyDefaultValue() {
+        assertEquals(7, """["get-in", [[1, 2, 3]], [[5]], 7]""".readEval())
+    }
 }
