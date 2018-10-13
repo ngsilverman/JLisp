@@ -14,6 +14,7 @@ class JLispProcessor(
         "array" to JArray,
         "eval" to Eval,
         "fn" to Fn,
+        "get" to Get,
         "get-in" to GetIn,
         "if" to If,
         "let" to Let,
